@@ -7,9 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.databinding.ItemCarBinding
 import com.kitrov.carsapplication.model.CarInfo
+import com.kitrov.carsapplication.model.entities.CarEntity
 
 class CarListAdapter: RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
-    private lateinit var carList:List<CarInfo>
+    private lateinit var carList:List<CarEntity>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarListAdapter.ViewHolder {
         val binding: ItemCarBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context),
@@ -25,7 +26,7 @@ class CarListAdapter: RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
         holder.bind(carList[position])
     }
 
-    fun updateCarList(carList:List<CarInfo>) {
+    fun updateCarList(carList:List<CarEntity>) {
         this.carList = carList
         notifyDataSetChanged()
     }
@@ -33,7 +34,7 @@ class CarListAdapter: RecyclerView.Adapter<CarListAdapter.ViewHolder>() {
     class ViewHolder(private val binding: ItemCarBinding):RecyclerView.ViewHolder(binding.root){
         private val viewModel = CarViewModel()
 
-        fun bind(carInfo: CarInfo) {
+        fun bind(carInfo: CarEntity) {
             viewModel.bind(carInfo)
             binding.viewModel = viewModel
         }

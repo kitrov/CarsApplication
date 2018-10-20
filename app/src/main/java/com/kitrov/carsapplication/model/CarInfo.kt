@@ -7,4 +7,5 @@ data class CarInfo(
     val model: ModelInfo,
     val batteryPercentage: Int,
     val batteryEstimatedDistance: Float,
-    val isCharging: Boolean)
+    val isCharging: Boolean
+)

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.databinding.ActivityCarListBinding
+import com.kitrov.carsapplication.injection.ViewModelFactory
 
 class CarListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCarListBinding
@@ -25,7 +26,7 @@ class CarListActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_car_list)
         binding.carList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        viewModel = ViewModelProviders.of(this).get(CarListViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, ViewModelFactory(this)).get(CarListViewModel::class.java)
         viewModel.errorMessage.observe(this, Observer {
             errorMessage -> if(errorMessage != null) showError(errorMessage) else hideError()
         })

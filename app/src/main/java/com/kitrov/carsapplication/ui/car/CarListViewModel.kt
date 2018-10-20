@@ -4,14 +4,17 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.base.BaseViewModel
-import com.kitrov.carsapplication.model.CarInfo
+import com.kitrov.carsapplication.model.CarDao
+import com.kitrov.carsapplication.model.entities.CarEntity
 import com.kitrov.carsapplication.network.CarApi
+import com.kitrov.carsapplication.utils.map
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CarListViewModel: BaseViewModel() {
+class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
     @Inject
     lateinit var carApi: CarApi
 
@@ -22,12 +25,21 @@ class CarListViewModel: BaseViewModel() {
     val errorClickListener = View.OnClickListener { loadAvailableCars() }
     val carListAdapter = CarListAdapter()
 
-    init{
+    init {
         loadAvailableCars()
     }
 
-    private fun loadAvailableCars(){
-        subscription = carApi.availableCars()
+    private fun loadAvailableCars() {
+        subscription = Observable.fromCallable { carDao.all }.concatMap { dbCarList ->
+            if (dbCarList.isEmpty()) {
+                carApi.availableCars().concatMap { apiCarList ->
+                    carDao.insertAll(*apiCarList.map { map(it) }.toTypedArray())
+                    Observable.just(apiCarList.map { map(it) })
+                }
+            } else {
+                Observable.just(dbCarList)
+            }
+        }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { onRetrievePostListStart() }
@@ -38,20 +50,20 @@ class CarListViewModel: BaseViewModel() {
             )
     }
 
-    private fun onRetrievePostListStart(){
+    private fun onRetrievePostListStart() {
         loadingVisibility.value = View.VISIBLE
         errorMessage.value = null
     }
 
-    private fun onRetrievePostListFinish(){
+    private fun onRetrievePostListFinish() {
         loadingVisibility.value = View.GONE
     }
 
-    private fun onRetrievePostListSuccess(carList:List<CarInfo>){
+    private fun onRetrievePostListSuccess(carList: List<CarEntity>) {
         carListAdapter.updateCarList(carList)
     }
 
-    private fun onRetrievePostListError(){
+    private fun onRetrievePostListError() {
         errorMessage.value = R.string.car_error
     }
 
