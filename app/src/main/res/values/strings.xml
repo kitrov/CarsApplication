@@ -4,6 +4,7 @@
     <string name="plate_number_label">Plate number: %s</string>
     <string name="battery_label">Battery %s%%</string>
     <string name="car_image">Car image</string>
+    <string name="car_list_filter">Filter</string>
 
     <!--Error handling-->
     <string name="retry">Retry</string>

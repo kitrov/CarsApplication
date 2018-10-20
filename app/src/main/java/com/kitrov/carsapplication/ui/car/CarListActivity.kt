@@ -2,6 +2,7 @@ package com.kitrov.carsapplication.ui.car
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.SearchView
 import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -31,6 +32,7 @@ class CarListActivity : AppCompatActivity() {
             errorMessage -> if(errorMessage != null) showError(errorMessage) else hideError()
         })
         binding.viewModel = viewModel
+        searchInit()
     }
 
     private fun showError(@StringRes errorMessage: Int) {
@@ -41,5 +43,22 @@ class CarListActivity : AppCompatActivity() {
 
     private fun hideError() {
         errorSnackbar?.dismiss()
+    }
+
+    private fun searchInit(){
+        val searchView = findViewById<SearchView>(R.id.search_bar)
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener,
+            SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.loadAvailableCars(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.loadAvailableCars(newText)
+                return false
+            }
+
+        })
     }
 }
