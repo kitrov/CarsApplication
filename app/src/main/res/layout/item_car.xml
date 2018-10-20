@@ -9,19 +9,47 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+        <ImageView
+                android:id="@+id/image"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:imageFromUrl="@{viewModel.photoUrl}"
+                tools:srcCompat="@mipmap/ic_launcher"
+                android:contentDescription="@string/car_image"/>
+
         <TextView
-                android:id="@+id/car_title"
+                android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:mutableText="@{viewModel.getTitle()}"
+                app:text="@{viewModel.title}"
                 tools:text="Nissan Leaf"/>
+
+        <TextView
+                android:id="@+id/plate_number"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/image"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:plateNumber="@{viewModel.plateNumber}"
+                tools:text="Plate number: TEST007"/>
+
+        <TextView
+                android:id="@+id/battery_level"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/image"
+                app:layout_constraintTop_toBottomOf="@id/plate_number"
+                app:batteryPercentage="@{viewModel.batteryPercentage}"
+                tools:text="Battery 70%"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

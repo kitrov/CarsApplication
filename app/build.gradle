@@ -62,4 +62,7 @@ dependencies {
 
     // Support Design
     implementation "com.google.android.material:material:$android_support_version"
+
+    // Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
