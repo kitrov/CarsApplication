@@ -49,3 +49,8 @@ fun setBatteryPercentage(view: TextView, batteryPercentage: MutableLiveData<Int>
             Observer { value -> view.setTextWithLabel(value.toString(), R.string.battery_label) })
     }
 }
+
+@BindingAdapter("distanceToUser")
+fun setDistanceToUser(view: TextView, distanceToUser: MutableLiveData<Float>) {
+    view.text = distanceText(distanceToUser.value)
+}

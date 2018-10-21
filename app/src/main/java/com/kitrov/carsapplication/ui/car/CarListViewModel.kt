@@ -1,13 +1,13 @@
 package com.kitrov.carsapplication.ui.car
 
 import android.view.View
-import android.widget.SearchView
 import androidx.lifecycle.MutableLiveData
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.base.BaseViewModel
 import com.kitrov.carsapplication.model.CarDao
 import com.kitrov.carsapplication.model.entities.CarEntity
 import com.kitrov.carsapplication.network.CarApi
+import com.kitrov.carsapplication.utils.calculateDistance
 import com.kitrov.carsapplication.utils.map
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -15,7 +15,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CarListViewModel(private val carDao: CarDao) : BaseViewModel(){
+class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
     @Inject
     lateinit var carApi: CarApi
 
@@ -23,33 +23,62 @@ class CarListViewModel(private val carDao: CarDao) : BaseViewModel(){
 
     val loadingVisibility: MutableLiveData<Int> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
-    val errorClickListener = View.OnClickListener { loadAvailableCars(null) }
+    val errorClickListener = View.OnClickListener { loadAvailableCars() }
     val carListAdapter = CarListAdapter()
 
-    init {
-        loadAvailableCars(null)
+    private var query: MutableLiveData<String> = MutableLiveData()
+    private var longitude: MutableLiveData<Double> = MutableLiveData()
+    private var latitude: MutableLiveData<Double> = MutableLiveData()
+
+    fun setQuery(query: String?) {
+        this.query.value = query
+        reloadAvailableCars()
     }
 
-    private fun filterList(carEntity: CarEntity, query: String?): Boolean {
-        if (query == null) {
-            return true
+    fun setLocation(latitude: Double, longitude: Double) {
+        if (this.latitude.value != latitude || this.longitude.value != longitude) {
+            this.latitude.value = latitude
+            this.longitude.value = longitude
+            reloadAvailableCars()
         }
+    }
+
+    init {
+        loadAvailableCars()
+    }
+
+    private fun filterList(carEntity: CarEntity): Boolean {
+        val query = this.query.value ?: return true
         return carEntity.plateNumber.contains(query, true) ||
                 carEntity.batteryPercentage.toString().contains(query, true) ||
                 carEntity.title.contains(query, true)
     }
 
-    fun loadAvailableCars(query: String?) {
+    private fun reloadAvailableCars() {
+        subscription.dispose()
+        loadAvailableCars()
+    }
+
+    private fun loadAvailableCars() {
         subscription = Observable.fromCallable { carDao.all }.concatMap { dbCarList ->
             if (dbCarList.isEmpty()) {
                 carApi.availableCars().concatMap { apiCarList ->
-                    carDao.insertAll(*apiCarList.map { map(it) }.toTypedArray())
+                    carDao.insertAll(*apiCarList.map { map(it, latitude.value, longitude.value) }.toTypedArray())
                     Observable.just(
-                        apiCarList.map { map(it) }
-                            .filter { filterList(it, query) })
+                        apiCarList.asSequence()
+                            .map { map(it, latitude.value, longitude.value) }
+                            .filter { filterList(it) }
+                            .sortedBy { it.distanceToUser }
+                            .toList()
+                    )
                 }
             } else {
-                Observable.just(dbCarList.filter { filterList(it, query) })
+                Observable.just(dbCarList
+                    .asSequence()
+                    .onEach { it.distanceToUser = calculateDistance(it, latitude.value, longitude.value) }
+                    .filter { filterList(it) }
+                    .sortedBy { it.distanceToUser }
+                    .toList())
             }
         }
             .subscribeOn(Schedulers.io())

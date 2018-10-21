@@ -11,6 +11,7 @@ class CarViewModel : BaseViewModel() {
     private val batteryPercentage = MutableLiveData<Int>()
     private val title = MutableLiveData<String>()
     private val photoUrl = MutableLiveData<String>()
+    private val distanceToUser = MutableLiveData<Float>()
 
     fun bind(carInfo: CarEntity) {
         plateNumber.value = carInfo.plateNumber
@@ -19,6 +20,7 @@ class CarViewModel : BaseViewModel() {
         batteryPercentage.value = carInfo.batteryPercentage
         title.value = carInfo.title
         photoUrl.value = carInfo.photoUrl
+        distanceToUser.value = carInfo.distanceToUser
     }
 
     fun getPlateNumber() = plateNumber
@@ -26,6 +28,8 @@ class CarViewModel : BaseViewModel() {
     fun getLatitude() = latitude
 
     fun getLongitude() = longitude
+
+    fun getDistanceToUser() = distanceToUser
 
     fun getBatteryPercentage() = batteryPercentage
 

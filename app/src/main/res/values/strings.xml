@@ -8,5 +8,7 @@
 
     <!--Error handling-->
     <string name="retry">Retry</string>
-    <string name="car_error">An error occurred while loading the posts</string>
+    <string name="car_error">An error occurred while loading available cars</string>
+    <string name="ask_permission_error">Please enable permissions for application to work properly</string>
+    <string name="error_no_location_perm">Can\'t get location</string>
 </resources>

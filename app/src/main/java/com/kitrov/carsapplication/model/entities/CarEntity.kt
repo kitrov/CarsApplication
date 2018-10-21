@@ -1,6 +1,7 @@
 package com.kitrov.carsapplication.model.entities
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "cars")
@@ -14,6 +15,7 @@ data class CarEntity(
 ) {
     @field:PrimaryKey
     var id: Int? = null
-    get() = field
-    set(value) {field = value}
+
+    @Ignore
+    var distanceToUser: Float? = null
 }
