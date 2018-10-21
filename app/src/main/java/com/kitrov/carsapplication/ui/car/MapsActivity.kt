@@ -2,6 +2,7 @@ package com.kitrov.carsapplication.ui.car
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.injection.ViewModelFactory
@@ -42,14 +44,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         rxLocation = RxLocation(this)
         mapFragment.getMapAsync(this)
+
+        findViewById<FloatingActionButton>(R.id.car_list).setOnClickListener {
+            val intent = Intent(this, CarListActivity::class.java)
+            this.startActivity(intent)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         moveCameraToCurrentLocation()
-
-//        // Add a marker in Sydney and move the camera
-//        this.googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
     }
 
     fun addMarker(latLng: LatLng, title: String) {
