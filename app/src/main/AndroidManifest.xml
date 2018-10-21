@@ -20,19 +20,25 @@
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key"/>
+        <uses-library
+                android:name="org.apache.http.legacy"
+                android:required="false"/>
 
         <activity
-                android:name=".MapsActivity"
-                android:label="@string/title_activity_maps">
-        </activity>
-        <activity
-                android:name=".ui.car.CarListActivity"
-                >
+                android:name=".ui.car.MapsActivity"
+                android:label="@string/title_activity_maps"
+                android:theme="@style/Theme.AppCompat.NoActionBar"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity
+                android:name=".ui.car.CarListActivity"
+                android:theme="@style/Theme.AppCompat.NoActionBar"
+                android:screenOrientation="portrait">
         </activity>
     </application>
 

@@ -18,4 +18,6 @@ data class CarEntity(
 
     @Ignore
     var distanceToUser: Float? = null
+
+    fun displayTitle() = "$title-$plateNumber"
 }

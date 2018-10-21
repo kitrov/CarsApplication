@@ -2,6 +2,7 @@ package com.kitrov.carsapplication.ui.car
 
 import android.view.View
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.maps.model.LatLng
 import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.base.BaseViewModel
 import com.kitrov.carsapplication.model.CarDao
@@ -29,6 +30,7 @@ class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
     private var query: MutableLiveData<String> = MutableLiveData()
     private var longitude: MutableLiveData<Double> = MutableLiveData()
     private var latitude: MutableLiveData<Double> = MutableLiveData()
+    private var mapsActivity: MapsActivity? = null
 
     fun setQuery(query: String?) {
         this.query.value = query
@@ -41,6 +43,11 @@ class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
             this.longitude.value = longitude
             reloadAvailableCars()
         }
+    }
+
+    fun setMapsActivity(mapsActivity: MapsActivity) {
+        this.mapsActivity = mapsActivity
+        reloadAvailableCars()
     }
 
     init {
@@ -65,10 +72,12 @@ class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
                 carApi.availableCars().concatMap { apiCarList ->
                     carDao.insertAll(*apiCarList.map { map(it, latitude.value, longitude.value) }.toTypedArray())
                     Observable.just(
-                        apiCarList.asSequence()
+                        apiCarList
+                            .asSequence()
                             .map { map(it, latitude.value, longitude.value) }
                             .filter { filterList(it) }
                             .sortedBy { it.distanceToUser }
+                            .onEach { mapsActivity?.addMarker(LatLng(it.latitude, it.longitude), it.displayTitle()) }
                             .toList()
                     )
                 }
@@ -78,6 +87,14 @@ class CarListViewModel(private val carDao: CarDao) : BaseViewModel() {
                     .onEach { it.distanceToUser = calculateDistance(it, latitude.value, longitude.value) }
                     .filter { filterList(it) }
                     .sortedBy { it.distanceToUser }
+                    .onEach {
+                        mapsActivity?.runOnUiThread {
+                            mapsActivity?.addMarker(
+                                LatLng(it.latitude, it.longitude),
+                                it.displayTitle()
+                            )
+                        }
+                    }
                     .toList())
             }
         }
