@@ -15,7 +15,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.kitrov.carsapplication.R
 import com.kitrov.carsapplication.injection.ViewModelFactory
 import com.kitrov.carsapplication.utils.ZOOM_CAMERA
 import com.patloew.rxlocation.RxLocation
@@ -80,6 +79,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     )
                         .setAction(R.string.retry, permissionClickListener)
                         .show()
+                } else {
+                    moveCameraToCurrentLocation()
+                    viewModel.setMapsActivity(this)
                 }
             }
     }
